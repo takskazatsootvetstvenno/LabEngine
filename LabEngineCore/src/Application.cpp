@@ -23,7 +23,6 @@ int Application::start(unsigned int window_width, unsigned int window_height,
         [](EventMouseMoved& event)
         {
             LOG_INFO("[MouseMoved] Mouse moved to " + std::to_string(event.x) +" x " + std::to_string(event.y))
-                 
         }
     );
      m_event_dispather.add_event_listener <EventWindowResize>(

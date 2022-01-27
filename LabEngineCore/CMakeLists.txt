@@ -6,6 +6,8 @@ set(CORE_PRIVATE_INCLUDES
 	src/Window.hpp
 	src/Rendering/OpenGL/ShaderProgram.hpp
 	src/Rendering/OpenGL/VertexBuffer.hpp
+	src/Rendering/OpenGL/VertexArray.hpp
+	src/Rendering/OpenGL/IndexBuffer.hpp
 )
 
 set(CORE_PUBLIC_INCLUDES
@@ -18,6 +20,8 @@ set(CORE_PRIVATE_SOURCES
 	src/Window.cpp
 	src/Rendering/OpenGL/ShaderProgram.cpp
 	src/Rendering/OpenGL/VertexBuffer.cpp
+	src/Rendering/OpenGL/VertexArray.cpp
+	src/Rendering/OpenGL/IndexBuffer.cpp
 )
 
 if(MSVC)
