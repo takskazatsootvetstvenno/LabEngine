@@ -17,50 +17,34 @@ namespace LabEngine {
 
 static bool s_GLFW_initialized = false;
 
-GLfloat points[] = {
-    0.0f, 0.5f, 0.0f,
-    0.5f, -0.5f, 0.0f, 
-    -0.5f, -0.5f, 0.0f
+GLfloat positions[] = {
+   -0.5f, 0.5f,
+    0.5f, 0.5f,
+    0.0f, -0.5f
 };
-
-GLfloat colors[] = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-
-GLfloat positions_colors[] = {
- 0.0f, 0.5f, 0.0f,   1.0f, 1.0f, 0.0f,
-0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 1.0f,
--0.5f, -0.5f, 0.0f,   1.0f, 1.0f, 1.0f,
--0.5f, 0.5f, 0.0f,   0.0f, 1.0f, 1.0f
-};
-
-int indices[] = { 0, 1, 2, 3, 0, 2 };
 
 const char* vertex_shader =
-    "#version 460\n"
-    "layout(location = 0) in vec3 vertex_position;"
-    "layout(location = 1) in vec3 vertex_color;"
-    "out vec3 color;"
+    "#version 450\n"
+    "layout(location = 0) in vec2 position;"
     "void main() {"
-    "   color = vertex_color;"
-    "   gl_Position = vec4(vertex_position, 1.0);"
+    "   gl_Position = vec4(position, 0.0, 1.0);"
     "}";
 
 const char* fragment_shader =
-    "#version 460\n"
-    "in vec3 color;"
-    "out vec4 frag_color;"
+    "#version 450\n"
+    "layout (location = 0) out vec4 outColor;"
     "void main() {"
-    "   frag_color = vec4(color, 1.0);"
+    "   outColor = vec4(1.0, 0.0, 1.0, 1.0);"
     "}";
 
 GLuint vao;
 std::unique_ptr<ShaderProgram> p_shader_program;
-
-std::unique_ptr<VertexBuffer> p_positions_colors_vbo;
+std::unique_ptr<VertexBuffer> p_positions_vbo;
 std::unique_ptr<VertexArray> p_vao_1buffer;
-std::unique_ptr<IndexBuffer> p_index_buffer;
 Window::Window(std::string title, const unsigned int width, const unsigned int height)
     : m_data({std::move(title), width, height}) {
     int resultCode = init();
+    assert(resultCode == 0 && "smth wrong with init!");
 }
 Window::~Window() {
     shutdown();
@@ -132,32 +116,27 @@ int Window::init() {
     if (!p_shader_program->isCompiled()) 
         return false;
 
-    BufferLayout buffer_layout_1vec3
+    BufferLayout buffer_layout_1vec2
     {
-        ShaderDataType::Float3
+        ShaderDataType::Float2
     };
 
-    BufferLayout buffer_layout_2vec3
-    {
-        ShaderDataType::Float3,
-        ShaderDataType::Float3
-    };
-    p_positions_colors_vbo = std::make_unique<VertexBuffer>(positions_colors, sizeof(positions_colors), buffer_layout_2vec3);
-    p_index_buffer = std::make_unique<IndexBuffer>(indices, sizeof(indices) / sizeof(GLuint));
+    p_positions_vbo = std::make_unique<VertexBuffer>(positions, sizeof(positions), buffer_layout_1vec2);
     p_vao_1buffer = std::make_unique<VertexArray>();
-
-    p_vao_1buffer->add_vertex_buffer(*p_positions_colors_vbo);
-    p_vao_1buffer->set_index_buffer(*p_index_buffer);
+    p_vao_1buffer->add_vertex_buffer(*p_positions_vbo);
     return 0;
 }
 void Window::on_update() {
     
     glClearColor(m_background_color[0], m_background_color[1], m_background_color[2],
                  m_background_color[3]);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
     p_shader_program->bind();
     p_vao_1buffer->bind();
     glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    glDisable(GL_DEPTH_TEST);
     glfwSwapBuffers(m_pWindow);
     glfwPollEvents();
 }

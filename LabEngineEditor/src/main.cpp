@@ -2,7 +2,7 @@
 #include <memory>
 #include "Application.hpp"
 #include "Log.hpp"
-//#include "Window.hpp"
+
 class MyApp : public LabEngine::Application {
     virtual void on_update() override {
     }    
